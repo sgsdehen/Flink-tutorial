@@ -22,7 +22,7 @@ public class SocketSourceDemo {
         int parallelism = lines.getParallelism();
         System.out.println("SocketSourceParallelism:" + parallelism);
 
-        // SocketSourceParallelism:1 socketTextStream是单并行的Source
+        // SocketSourceParallelism:1 socketTextStream是非并行的Source
         SingleOutputStreamOperator<String> words = lines.flatMap(new FlatMapFunction<String, String>() {
             @Override
             public void flatMap(String s, Collector<String> collector) throws Exception {

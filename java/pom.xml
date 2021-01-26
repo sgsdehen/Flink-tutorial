@@ -37,11 +37,7 @@
         <!-- Apache Flink dependencies -->
         <!-- These dependencies are provided, because they should not be packaged into the JAR file. -->
 
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-filesystem_${scala.binary.version}</artifactId>
-            <version>1.12-SNAPSHOT</version>
-        </dependency>
+
 
         <dependency>
             <groupId>org.apache.hadoop</groupId>

@@ -21,7 +21,7 @@ public class JDBCSinkDemo {
 
         // socketTextStream(String hostname, int port, String delimiter, long maxRetry)
         DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
-
+        // 必须开启 Checkpoin 否则不会写入数据
         env.enableCheckpointing(5000);
 
         SingleOutputStreamOperator<Tuple2<String, Integer>> words = lines.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
@@ -52,7 +52,7 @@ public class JDBCSinkDemo {
                     ps.setInt(3, t.f1);
                 },
                 new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-                        .withUrl("jdbc:mysql://hadoop102:3306/test?")
+                        .withUrl("jdbc:mysql://hadoop102:3306/test")
                         .withDriverName("com.mysql.jdbc.Driver")
                         .withUsername("root")
                         .withPassword("123456")

@@ -29,11 +29,13 @@
             <artifactId>flink-java</artifactId>
             <version>${flink.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients_${scala.binary.version}</artifactId>
@@ -69,6 +71,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.48</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-filesystem_${scala.binary.version}</artifactId>
+            <version>1.12-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
