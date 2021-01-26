@@ -1,0 +1,7 @@
+/.idea/
+/java/target/
+/java/src/test/
+/scala/src/test/
+/scala/target/
+/Flink-tutorial.iml
+/data/
