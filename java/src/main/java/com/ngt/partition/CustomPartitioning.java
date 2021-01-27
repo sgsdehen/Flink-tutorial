@@ -31,7 +31,7 @@ public class CustomPartitioning {
 //                return value + " ：" + getRuntimeContext().getIndexOfThisSubtask();
                 return Tuple2.of(value, getRuntimeContext().getIndexOfThisSubtask());
             }
-        }).setParallelism(1);
+        }).setParallelism(4);
 
         // 使用随机的方式将数据发送到下游
         DataStream<Tuple2<String, Integer>> partitionCustom = mapDataStream.partitionCustom(new Partitioner<String>() {
@@ -53,7 +53,7 @@ public class CustomPartitioning {
         partitionCustom.addSink(new RichSinkFunction<Tuple2<String, Integer>>() {
             @Override
             public void invoke(Tuple2<String, Integer> value, Context context) throws Exception {
-                System.out.println(value.f0 + " -> " + getRuntimeContext().getIndexOfThisSubtask());
+                System.out.println(value.f0 + " : " + value.f1 + " -> " + getRuntimeContext().getIndexOfThisSubtask());
             }
         });
 
@@ -62,12 +62,12 @@ public class CustomPartitioning {
 }
 
 /*
-    aa -> 0
-    hadoop -> 3
-    flink -> 2
-    scala -> 0
-    spark -> 1
-    hadoop -> 3
-    flink -> 2
-    dfdf -> 0
+    spark : 3 -> 1
+    spark : 0 -> 1
+    flink : 1 -> 2
+    hadoop : 2 -> 3
+    flink : 3 -> 2
+    java : 0 -> 0
+    scala : 1 -> 0
+    hadoop : 2 -> 3
  */
