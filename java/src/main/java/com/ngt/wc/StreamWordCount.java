@@ -16,7 +16,7 @@ import org.apache.flink.util.Collector;
 public class StreamWordCount {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<String> lines = env.socketTextStream("192.168.100.102", 8888);
+        DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
         SingleOutputStreamOperator<Tuple2<String, Integer>> words = lines.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
             @Override
             public void flatMap(String s, Collector<Tuple2<String, Integer>> collector) throws Exception {

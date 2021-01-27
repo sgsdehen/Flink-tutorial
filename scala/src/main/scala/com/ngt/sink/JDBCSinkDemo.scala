@@ -1,5 +1,6 @@
 package com.ngt.sink
 
+import org.apache.flink.api.java.tuple.Tuple2
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.connector.jdbc.{JdbcConnectionOptions, JdbcSink}
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator
@@ -15,7 +16,7 @@ import java.sql.{Connection, DriverManager, PreparedStatement}
 object JDBCSinkDemo {
 
   // JdbcSink 暂时不支持 Scala 操作？ 没有测试通过，还需要查询相关资料
-  def main1(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     val words: DataStream[String] = env.socketTextStream("192.168.31.8", 8888)
     env.enableCheckpointing(5000)
@@ -29,14 +30,14 @@ object JDBCSinkDemo {
 
     summed.print()
     // 此处需要类型转换操作
-    val outputStream: SingleOutputStreamOperator[(String, Int)] = summed.asInstanceOf[SingleOutputStreamOperator[(String, Int)]]
+    val outputStream = summed.asInstanceOf[SingleOutputStreamOperator[Tuple2[String, Integer]]]
 
     outputStream.addSink(JdbcSink.sink("insert into wordcount(word,count) values (?,?) on duplicate key update count = ?",
       (ps, t) => {
         // word 必须是主键才能达到更新数据的目的
-        ps.setString(1, t._1)
-        ps.setInt(2, t._2)
-        ps.setInt(3, t._2)
+        ps.setString(1, t.f0)
+        ps.setInt(2, t.f1)
+        ps.setInt(3, t.f1)
       },
       new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
         .withUrl("jdbc:mysql://hadoop102:3306/test")
@@ -48,7 +49,7 @@ object JDBCSinkDemo {
   }
 
   // 使用自定义Sink的方式实现JDBC操作
-  def main(args: Array[String]): Unit = {
+  def main2(args: Array[String]): Unit = {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     val words: DataStream[String] = env.socketTextStream("192.168.31.8", 8888)
 
@@ -85,4 +86,5 @@ object JDBCSinkDemo {
       conn.close()
     }
   }
+
 }

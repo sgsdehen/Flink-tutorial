@@ -18,7 +18,7 @@ public class LambdaStreamWordCount {
     public static void main(String[] args) throws Exception {
         // 手动创建本地运行环境，用于本地测试
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment(8);
-        DataStreamSource<String> lines = env.socketTextStream("192.168.100.102", 8888);
+        DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
 
 
         // 要使用 returns 指定返回的类型
