@@ -32,7 +32,7 @@ public class StreamingFileSinkDemo {
                 .build();
 
         StreamingFileSink<String> sink = StreamingFileSink.forRowFormat(
-                new Path("data/out"),           //指的文件存储目录
+                new Path("hdfs://192.168.100.102:9000/tmp/Checkpointing"),  //指的文件存储目录
                 new SimpleStringEncoder<String>("UTF-8")) //指的文件的编码
                 .withRollingPolicy(rollingPolicy)                     //传入文件滚动生成策略
                 .build();

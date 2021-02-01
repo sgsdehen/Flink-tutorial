@@ -16,7 +16,7 @@ public class MinByDemo {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
 
-        // 输入：身份，城市。金额
+        // 输入：省份,城市,金额
         SingleOutputStreamOperator<Tuple3<String, String, Double>> provinceCityAndMoney = lines.map(new MapFunction<String, Tuple3<String, String, Double>>() {
             @Override
             public Tuple3<String, String, Double> map(String value) throws Exception {
@@ -25,11 +25,11 @@ public class MinByDemo {
             }
         });
         /*
-            统一输入
-            A,b,3000
-            A,d,2000
-            A,f,2000
-            B,b,1000
+统一输入
+A,b,3000
+A,d,2000
+A,f,2000
+B,b,1000
          */
 
         // min 不会更新非分区字段
@@ -51,7 +51,7 @@ public class MinByDemo {
          */
 
         // minBy 会更新非分区字段，当第二次参数为 false 的时候，会返回最后个具有最小值的元素
-        provinceCityAndMoney.keyBy((t -> t.f0)).minBy(2, false).print();
+        provinceCityAndMoney.keyBy(t -> t.f0).minBy(2, false).print();
         /*
         7> (A,b,3000.0)
         7> (A,d,2000.0)

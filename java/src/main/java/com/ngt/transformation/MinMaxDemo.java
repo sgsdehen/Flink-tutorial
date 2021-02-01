@@ -15,6 +15,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 public class MinMaxDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        
         //spark,10
         DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
 

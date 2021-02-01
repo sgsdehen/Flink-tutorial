@@ -60,6 +60,7 @@ public class FlatMapDemo {
             String[] words = line.split(" ");
             for (String word : words) {
                 if (!"error".equals(word)) {
+                    // 注意此处要使用 replace 方法替换
                     output.collect(element.replace(word));
                 }
             }

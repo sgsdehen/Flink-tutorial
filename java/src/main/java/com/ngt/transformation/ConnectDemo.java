@@ -27,6 +27,7 @@ public class ConnectDemo {
         // 允许两个流之间共享状态
         ConnectedStreams<String, Double> connect = lines1.connect(map);
 
+        // 流1的类型，流2的类型，生成新流的类型
         SingleOutputStreamOperator<String> result = connect.map(new CoMapFunction<String, Double, String>() {
             @Override
             public String map1(String value) throws Exception {
@@ -38,6 +39,7 @@ public class ConnectDemo {
                 return value * 10 + "";
             }
             // 两个流的map方法执行完的返回值会放入到新的流中
+
 
         });
         result.print();

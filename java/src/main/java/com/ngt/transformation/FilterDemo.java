@@ -31,6 +31,7 @@ public class FilterDemo {
         SingleOutputStreamOperator<Integer> filter1 = nums.filter(i -> (i & 1) == 0);
         filter1.print();
 
+        // 同 map 可以调用 transform，更底层的实现方式
         SingleOutputStreamOperator<Integer> myFilter = nums.transform("MyFilter", TypeInformation.of(Integer.class), new MyStreamFilter());
         myFilter.print();
 

@@ -18,10 +18,10 @@ object JDBCSinkDemo {
   // JdbcSink 暂时不支持 Scala 操作？ 没有测试通过，还需要查询相关资料
   def main(args: Array[String]): Unit = {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
-    val words: DataStream[String] = env.socketTextStream("192.168.31.8", 8888)
+    val lines: DataStream[String] = env.socketTextStream("192.168.31.8", 8888)
     env.enableCheckpointing(5000)
 
-    val summed: DataStream[(String, Int)] = words
+    val summed: DataStream[(String, Int)] = lines
       .flatMap(_.split(" "))
       .filter(_.nonEmpty)
       .map((_, 1))

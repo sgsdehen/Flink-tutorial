@@ -20,7 +20,7 @@ public class KeyedMultipleDemo {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
 
-        // 输入：身份，城市。金额
+        // 输入：省份,城市,金额
         SingleOutputStreamOperator<Tuple3<String, String, Double>> provinceCityAndMoney = lines.map(new MapFunction<String, Tuple3<String, String, Double>>() {
             @Override
             public Tuple3<String, String, Double> map(String value) throws Exception {

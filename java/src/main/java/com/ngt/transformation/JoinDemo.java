@@ -20,6 +20,8 @@ import java.util.Arrays;
 /**
  * @author ngt
  * @create 2021-01-27 23:46
+ * 窗口联接联接共享一个公共键并位于同一窗口中的两个流的元素。
+ * 可以使用窗口分配器定义这些窗口，并在两个流的元素上计算这些窗口。
  */
 public class JoinDemo {
     public static void main(String[] args) throws Exception {

@@ -7,6 +7,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 /**
  * @author ngt
  * @create 2021-01-27 23:33
+    Connect与 Union 区别：
+    1． Union之前两个流的类型必须是一样，Connect可以不一样，在之后的coMap中再去调整成为一样的。
+    2. Connect只能操作两个流，Union可以操作多个。
  */
 public class UnionDemo {
     public static void main(String[] args) throws Exception {
