@@ -1,24 +1,26 @@
-package com.ngt.window;
+package com.ngt.function;
 
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.util.OutputTag;
 
 import java.time.Duration;
 
 /**
  * @author ngt
- * @create 2021-01-28 23:13
+ * @create 2021-02-01 0:40
+ * 将迟到的数据使用测流输出
  */
-public class EvenTimeTumblingWindowDemo {
+public class WindowLateDateDemo {
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         conf.setInteger("rest.port", 8181);
@@ -39,30 +41,32 @@ public class EvenTimeTumblingWindowDemo {
                         .withTimestampAssigner((element, recordTimestamp) -> element.f0))
                         .setParallelism(1);   // 将并行度设置为 1
 
+        // 处理迟到数据
+        OutputTag<Tuple3<Long, String, Integer>> lastoutputTag = new OutputTag<>("last") {
+        };
+
         // 如果 operator 并行度大于1 那么每个窗口的时间满足条件才会触发窗口
-        operator.keyBy(data -> data.f1).window(TumblingEventTimeWindows.of(Time.seconds(5))).sum(2).print();
+        WindowedStream<Tuple3<Long, String, Integer>, String, TimeWindow> mainStream = operator.keyBy(data -> data.f1)
+                .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+                .sideOutputLateData(lastoutputTag);
+
+        SingleOutputStreamOperator<Tuple3<Long, String, Integer>> sumed = mainStream.sum(2);
+        sumed.print();
+        // 主流中获取迟到的数据
+        sumed.getSideOutput(lastoutputTag).print("lastdata");
         env.execute();
     }
 }
 
 /*
-输入
 1609512630000,a,1
-1609512631000,a,2
-1609512634000,b,5
-1609512634998,a,3
-1609512634999,a,4
-1609512635000,b,11
-1609512638000,b,9
-1609512639999,a,16
-1609512640000,b,18
-
-输出
-2> (1609512634000,b,5) 1+2+3+4
-6> (1609512634999,a,10) 5
-2> (1609512635000,b,20) 16
-6> (1609512639999,a,16) 9+11
-时间并不会分区只要满足窗口就触发
-
+1609512631000,b,3
+1609512632000,c,5
+1609512633000,b,6
+1609512635000,a,2
+1609512636000,a,1
+1609512638000,c,8
+1609512639000,b,9
+1609512640000,a,3
 
  */
