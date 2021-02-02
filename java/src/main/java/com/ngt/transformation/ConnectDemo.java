@@ -22,7 +22,7 @@ public class ConnectDemo {
         DataStreamSource<String> lines1 = env.socketTextStream("192.168.31.8", 8888);
         DataStreamSource<String> lines2 = env.socketTextStream("192.168.31.8", 9999);
 
-        SingleOutputStreamOperator<Double> map = lines2.map(w -> Double.parseDouble(w));
+        SingleOutputStreamOperator<Double> map = lines2.map(Double::parseDouble);
 
         // 允许两个流之间共享状态
         ConnectedStreams<String, Double> connect = lines1.connect(map);

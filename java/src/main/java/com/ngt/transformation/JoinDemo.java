@@ -5,10 +5,7 @@ import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.TimeCharacteristic;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.JoinedStreams;
-import org.apache.flink.streaming.api.datastream.KeyedStream;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
@@ -50,14 +47,18 @@ public class JoinDemo {
         KeyedStream<Tuple2<String, Integer>, String> keyBy1 = wordAndOne1.keyBy(data -> data.f0);
         KeyedStream<Tuple2<String, Integer>, String> keyBy2 = wordAndOne2.keyBy(data -> data.f0);
 
-        keyBy1.join(keyBy2).where(data -> data.f0).equalTo(data -> data.f0)
+        DataStream<Tuple2<String, Integer>> apply = keyBy1.join(keyBy2)
+                .where(data -> data.f0)
+                .equalTo(data -> data.f0)
                 .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
                 .apply(new JoinFunction<Tuple2<String, Integer>, Tuple2<String, Integer>, Tuple2<String, Integer>>() {
                     @Override
                     public Tuple2<String, Integer> join(Tuple2<String, Integer> first, Tuple2<String, Integer> second) throws Exception {
                         return Tuple2.of(first.f0, first.f1 + second.f1);
                     }
-                }).print();
+                });
+
+        apply.print();
 
         env.execute();
     }

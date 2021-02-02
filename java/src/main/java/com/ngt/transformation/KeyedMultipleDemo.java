@@ -30,7 +30,7 @@ public class KeyedMultipleDemo {
         });
 
         // 1. 同时使用多个字段作为分组的依据
-//        provinceCityAndMoney.keyBy(0, 1).sum(2).print();
+        provinceCityAndMoney.keyBy(0, 1).sum(2).print();
 
         // 2. 使用 KeySelector, 将两个字段相加
         provinceCityAndMoney.keyBy(new KeySelector<Tuple3<String, String, Double>, String>() {
@@ -48,12 +48,12 @@ public class KeyedMultipleDemo {
             }
         }).sum(2).print();
 
-        // 4. 使用 KeySelector, 将两个字段相加,使用 lambda 表达式
+        // 4. 使用 lambda 表达式，将两个字段相加
         provinceCityAndMoney.keyBy(value -> value.f0 + value.f1).sum(2).print();
 
-        // 5. 使用
-        provinceCityAndMoney.keyBy( value -> Tuple2.of(value.f0, value.f1)).sum(2).
-                returns(Types.TUPLE(Types.STRING,Types.STRING,Types.DOUBLE)).print();
+        // 5. 使用 lambda 表达式，将两个字段构成一个元组
+        provinceCityAndMoney.keyBy(value -> Tuple2.of(value.f0, value.f1)).sum(2).
+                returns(Types.TUPLE(Types.STRING, Types.STRING, Types.DOUBLE)).print();
         env.execute();
     }
 }

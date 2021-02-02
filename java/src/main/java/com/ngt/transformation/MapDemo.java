@@ -68,7 +68,7 @@ public class MapDemo {
             //StreamRecord<String> stringStreamRecord = new StreamRecord<>(upperCase);
             //output.collect(stringStreamRecord);
 
-            // 2. 推荐使用replace方法，将要输出的数据替换原来的
+            // 2. 推荐使用replace方法，将要输出的数据替换原来的数据
             element.replace(upperCase);
 
             // 必须手动输出数据

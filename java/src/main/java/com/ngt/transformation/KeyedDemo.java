@@ -21,6 +21,7 @@ public class KeyedDemo {
         // keyby 需要 Tuple 类型，需要 returns 指定类型
         SingleOutputStreamOperator<Tuple2<String, Integer>> map = lines.map(w -> Tuple2.of(w, 1))
                 .returns(Types.TUPLE(Types.STRING, Types.INT));
+
         // 1. 使用下标，只适用于元组，新版中已过时
         map.keyBy(0).sum(1).print();
 

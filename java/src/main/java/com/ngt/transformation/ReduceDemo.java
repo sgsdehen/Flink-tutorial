@@ -31,6 +31,7 @@ public class ReduceDemo {
             }
         });
 
+
         reduced.print();
         env.execute("ReduceDemo");
     }

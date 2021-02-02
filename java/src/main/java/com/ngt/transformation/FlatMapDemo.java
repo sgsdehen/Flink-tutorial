@@ -1,6 +1,7 @@
 package com.ngt.transformation;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -19,6 +20,8 @@ public class FlatMapDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
+
+
 
         // 1. 使用 flatMap 拆分并过滤
         SingleOutputStreamOperator<String> mapOut = lines.flatMap(new FlatMapFunction<String, String>() {
