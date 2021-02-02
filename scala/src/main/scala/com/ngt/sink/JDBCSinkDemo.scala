@@ -60,11 +60,11 @@ object JDBCSinkDemo {
       .keyBy(_._1)
       .sum(1)
 
-    summed.addSink(new MyJdbcSinkFunc())
+    summed.addSink(MyJdbcSinkFunc())
     env.execute()
   }
 
-  class MyJdbcSinkFunc extends RichSinkFunction[(String, Int)] {
+  case class MyJdbcSinkFunc() extends RichSinkFunction[(String, Int)] {
     var conn: Connection = _
     var updateStmt: PreparedStatement = _
 

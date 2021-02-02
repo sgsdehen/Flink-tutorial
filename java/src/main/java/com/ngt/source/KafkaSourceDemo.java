@@ -22,7 +22,7 @@ public class KafkaSourceDemo {
         props.setProperty("group.id", "gwc10");
         //如果没有记录偏移量，第一次从最开始消费
         props.setProperty("auto.offset.reset", "earliest");
-        //kafka的消费者不自动提交偏移量
+        //kafka的消费者是否自动提交偏移量
         //props.setProperty("enable.auto.commit", "false");
 
 

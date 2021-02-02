@@ -50,6 +50,7 @@ public class CustomSourceDemo {
             }
         }
 
+        // WubUI中的 Cancel Job按钮触发该函数
         @Override
         public void cancel() {
 
@@ -66,6 +67,7 @@ public class CustomSourceDemo {
             }
         }
 
+        // WubUI中的 Cancel Job按钮触发该函数
         @Override
         public void cancel() {
 
