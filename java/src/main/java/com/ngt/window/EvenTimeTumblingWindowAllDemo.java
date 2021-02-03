@@ -19,6 +19,7 @@ import java.time.Duration;
 /**
  * @author ngt
  * @create 2021-01-28 21:43
+ *
  */
 public class EvenTimeTumblingWindowAllDemo {
     public static void main(String[] args) throws Exception {
@@ -66,5 +67,5 @@ public class EvenTimeTumblingWindowAllDemo {
 输出
 (1609512630000,18) 1+2+5+3+7
 (1609512635000,27) 11+16
-区间左闭右开 一个窗口中包含， [0000,4999)， 但是需要 5000 才能触发
+闭区间 一个窗口中包含， [0000,4999]， 但是需要 5000 才能触发
  */

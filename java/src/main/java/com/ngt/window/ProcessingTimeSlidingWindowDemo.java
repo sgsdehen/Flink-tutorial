@@ -32,10 +32,10 @@ public class ProcessingTimeSlidingWindowDemo {
             return Tuple2.of(split[0], Integer.valueOf(split[1]));
         }).returns(Types.TUPLE(Types.STRING, Types.INT));
 
-        KeyedStream<Tuple2<String, Integer>, String> keyBy = wordAndCount.keyBy(t -> t.f0);
+        KeyedStream<Tuple2<String, Integer>, String> keyed = wordAndCount.keyBy(t -> t.f0);
 
         WindowedStream<Tuple2<String, Integer>, String, TimeWindow> windowed =
-                keyBy.window(SlidingProcessingTimeWindows.of(Time.seconds(30), Time.seconds(10)));
+                keyed.window(SlidingProcessingTimeWindows.of(Time.seconds(30), Time.seconds(10)));
 
         windowed.sum(1).print();
         env.execute();

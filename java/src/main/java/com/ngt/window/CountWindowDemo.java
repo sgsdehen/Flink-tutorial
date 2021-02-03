@@ -27,9 +27,9 @@ public class CountWindowDemo {
             return Tuple2.of(split[0], Integer.valueOf(split[1]));
         }).returns(Types.TUPLE(Types.STRING, Types.INT));
 
-        KeyedStream<Tuple2<String, Integer>, String> keyBy = wordAndCount.keyBy(t -> t.f0);
+        KeyedStream<Tuple2<String, Integer>, String> keyed = wordAndCount.keyBy(t -> t.f0);
         // 组内增量聚合，组内达到指定的条数就进行触发输出
-        keyBy.countWindow(3).sum(1).print();
+        keyed.countWindow(3).sum(1).print();
         env.execute();
     }
 }

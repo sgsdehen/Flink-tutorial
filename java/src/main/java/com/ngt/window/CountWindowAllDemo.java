@@ -29,3 +29,13 @@ public class CountWindowAllDemo {
         env.execute();
     }
 }
+
+/*
+3
+4  →  7
+5
+2  →  14
+8
+9  →  24
+注意当输入两个数据的时候就会输出结果
+ */

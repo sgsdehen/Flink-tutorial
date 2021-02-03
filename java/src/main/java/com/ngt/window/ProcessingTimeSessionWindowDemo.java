@@ -31,16 +31,18 @@ public class ProcessingTimeSessionWindowDemo {
             return Tuple2.of(split[0], Integer.valueOf(split[1]));
         }).returns(Types.TUPLE(Types.STRING, Types.INT));
 
-        KeyedStream<Tuple2<String, Integer>, String> keyBy = wordAndCount.keyBy(t -> t.f0);
+        KeyedStream<Tuple2<String, Integer>, String> keyed = wordAndCount.keyBy(t -> t.f0);
 
-        WindowedStream<Tuple2<String, Integer>, String, TimeWindow> windowed =
-                keyBy.window(ProcessingTimeSessionWindows.withGap(Time.seconds(10)));
+
+        keyed.window(ProcessingTimeSessionWindows.withGap(Time.seconds(10)))
+                .sum(1)
+                .print();
 
         // 触发时间动态调整，比如和字段的属性有关，注意单位是毫秒
-        WindowedStream<Tuple2<String, Integer>, String, TimeWindow> windowed1 =
-                keyBy.window(ProcessingTimeSessionWindows.withDynamicGap(element -> element.f1 * 5000));
+        keyed.window(ProcessingTimeSessionWindows.withDynamicGap(element -> element.f1 * 5000))
+                .sum(1)
+                .print();
 
-        windowed.sum(1).print();
         env.execute();
     }
 }
