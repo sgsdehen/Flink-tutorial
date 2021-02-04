@@ -25,12 +25,15 @@ public class CountWindowAllReduceDemo {
         // 不分组，将整体当成一个组。并行度为1
         AllWindowedStream<Integer, GlobalWindow> window = nums.countWindowAll(4, 2);
 
-        window.reduce(new ReduceFunction<Integer>() {
-            @Override
-            public Integer reduce(Integer value1, Integer value2) throws Exception {
-                return value1 + value2;
-            }
-        }).print();
+        window.reduce((ReduceFunction<Integer>) (value1, value2) -> value1 + value2).print();
         env.execute();
     }
 }
+
+/*
+45
+65  110
+78
+45  233
+
+ */

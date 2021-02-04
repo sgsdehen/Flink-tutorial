@@ -6,7 +6,6 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.util.Collector
 
-import java.util.Spliterator
 import java.{lang, util}
 
 /**
@@ -44,7 +43,6 @@ object TumblingWindowLeftJoinDemo {
                              out: Collector[(Long, String, Int, Long, Int)]): Unit = {
           val firstValue: util.Iterator[(Long, String, Int)] = first.iterator()
           val secondValue: util.Iterator[(Long, String, Int)] = second.iterator()
-
         }
       })
   }

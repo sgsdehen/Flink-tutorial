@@ -23,7 +23,8 @@ public class ProcessingTimeSlidingWindowAllDemo {
 
         // 不分组，将整体当成一个组。并行度为, ProcessingTime 10 秒钟窗口，每5秒钟滑动一次
         nums.windowAll(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(5)))
-                .sum(0).print();
+                .sum(0)
+                .print();
         env.execute();
     }
 }
