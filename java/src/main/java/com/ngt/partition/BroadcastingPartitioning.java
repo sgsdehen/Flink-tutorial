@@ -13,6 +13,7 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 /**
  * @author ngt
  * @create 2021-01-28 4:46
+ * https://ci.apache.org/projects/flink/flink-docs-release-1.12/zh/dev/stream/operators/#%E7%89%A9%E7%90%86%E5%88%86%E5%8C%BA
  */
 public class BroadcastingPartitioning {
     public static void main(String[] args) throws Exception {
