@@ -48,7 +48,7 @@ public class ProcessingTimeTimerDemo1 {
 
             @Override
             public void processElement(Tuple2<String, Integer> value, Context ctx, Collector<Tuple2<String, Integer>> out) throws Exception {
-                // 注册一个30s的定时器
+                // 注册整点定时器
                 long currentProcessingTime = ctx.timerService().currentProcessingTime();
                 System.out.println("定时器注册时间：" + currentProcessingTime + " 定时器触发时间：" + (currentProcessingTime + 10000));
                 ctx.timerService().registerProcessingTimeTimer((currentProcessingTime / 60000 + 1) * 60000);

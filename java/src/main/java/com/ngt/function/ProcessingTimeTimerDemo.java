@@ -19,7 +19,7 @@ public class ProcessingTimeTimerDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
-        SingleOutputStreamOperator<Tuple2<String, Integer>> words = lines.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
+        SingleOutputStreamOperator<Tuple2<String, Integer>> wordAndOne = lines.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
             @Override
             public void flatMap(String s, Collector<Tuple2<String, Integer>> collector) throws Exception {
                 String[] words = s.split(" ");
@@ -27,7 +27,7 @@ public class ProcessingTimeTimerDemo {
             }
         });
 
-        KeyedStream<Tuple2<String, Integer>, String> keyed = words.keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
+        KeyedStream<Tuple2<String, Integer>, String> keyed = wordAndOne.keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
             @Override
             public String getKey(Tuple2<String, Integer> tp) throws Exception {
                 return tp.f0;
@@ -43,10 +43,10 @@ public class ProcessingTimeTimerDemo {
 
             @Override
             public void processElement(Tuple2<String, Integer> value, Context ctx, Collector<Tuple2<String, Integer>> out) throws Exception {
-                // 注册一个30s的定时器
+                // 注册一个10s的定时器
                 long currentProcessingTime = ctx.timerService().currentProcessingTime();
                 System.out.println("定时器注册时间：" + currentProcessingTime + " 定时器触发时间：" + (currentProcessingTime + 10000));
-                ctx.timerService().registerProcessingTimeTimer(currentProcessingTime + 10000);
+                ctx.timerService().registerProcessingTimeTimer(currentProcessingTime + 10 * 1000L);
             }
 
             @Override
