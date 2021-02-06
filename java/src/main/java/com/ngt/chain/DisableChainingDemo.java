@@ -37,7 +37,7 @@ public class DisableChainingDemo {
         SingleOutputStreamOperator<String> filterd = words.filter(new FilterFunction<String>() {
             @Override
             public boolean filter(String value) throws Exception {
-                return value.startsWith("reeor");
+                return value.startsWith("error");
             }
         }).disableChaining();
 

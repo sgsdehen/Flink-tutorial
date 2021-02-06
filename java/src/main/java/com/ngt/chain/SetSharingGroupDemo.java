@@ -37,9 +37,11 @@ public class SetSharingGroupDemo {
         SingleOutputStreamOperator<String> filterd = words.filter(new FilterFunction<String>() {
             @Override
             public boolean filter(String value) throws Exception {
-                return value.startsWith("reeor");
+                return value.startsWith("error");
             }
-        }).setParallelism(4).disableChaining().slotSharingGroup("doit");// 后面共享资源槽的名字都是 doit
+        }).setParallelism(4)
+                .disableChaining()
+                .slotSharingGroup("doit");// 后面共享资源槽的名字都是 doit
 
 
         SingleOutputStreamOperator<Tuple2<String, Integer>> wordAndOne = filterd.map(new MapFunction<String, Tuple2<String, Integer>>() {

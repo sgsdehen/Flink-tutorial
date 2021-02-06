@@ -27,12 +27,11 @@ public class CustomPartitioning {
         SingleOutputStreamOperator<Tuple2<String, Integer>> mapDataStream = words.map(new RichMapFunction<String, Tuple2<String, Integer>>() {
             @Override
             public Tuple2<String, Integer> map(String value) throws Exception {
-//                return value + " ：" + getRuntimeContext().getIndexOfThisSubtask();
                 return Tuple2.of(value, getRuntimeContext().getIndexOfThisSubtask());
             }
         }).setParallelism(4);
 
-        // 使用随机的方式将数据发送到下游
+        // 使用自定义的方式将数据发送到下游
         DataStream<Tuple2<String, Integer>> partitionCustom = mapDataStream.partitionCustom(new Partitioner<String>() {
             @Override
             public int partition(String key, int numPartitions) {
