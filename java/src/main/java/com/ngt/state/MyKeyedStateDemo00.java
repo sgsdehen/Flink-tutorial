@@ -25,13 +25,14 @@ public class MyKeyedStateDemo00 {
         env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, Time.seconds(5)));
         env.enableCheckpointing(5000);
 
-        SingleOutputStreamOperator<Tuple2<String, Integer>> words = lines.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
+        // 验证异常发生之后状态是否能够保存
+        SingleOutputStreamOperator<Tuple2<String, Integer>> wordAndOne = lines.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
             @Override
             public void flatMap(String s, Collector<Tuple2<String, Integer>> collector) throws Exception {
                 String[] words = s.split(" ");
                 for (String word : words) {
-                    if ("error".equals(word)) {
-                        throw new RuntimeException("Exception");
+                    if ("error".equals(word)) { 
+                        throw new RuntimeException("Exception"); 
                     }
                     collector.collect(Tuple2.of(word, 1));
                 }
@@ -39,7 +40,7 @@ public class MyKeyedStateDemo00 {
         });
 
 
-        KeyedStream<Tuple2<String, Integer>, String> keyed = words.keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
+        KeyedStream<Tuple2<String, Integer>, String> keyed = wordAndOne.keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
             @Override
             public String getKey(Tuple2<String, Integer> tp) throws Exception {
                 return tp.f0;

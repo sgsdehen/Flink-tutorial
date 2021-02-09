@@ -33,7 +33,7 @@ public class QueryableStateDemo {
         env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, Time.seconds(3)));
         DataStreamSource<String> lines = env.socketTextStream("192.168.31.8", 8888);
 
-        SingleOutputStreamOperator<Tuple2<String, Integer>> words = lines.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
+        SingleOutputStreamOperator<Tuple2<String, Integer>> wordAndOne = lines.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
             @Override
             public void flatMap(String s, Collector<Tuple2<String, Integer>> collector) throws Exception {
                 String[] words = s.split(" ");
@@ -43,7 +43,7 @@ public class QueryableStateDemo {
             }
         });
 
-        KeyedStream<Tuple2<String, Integer>, String> keyed = words.keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
+        KeyedStream<Tuple2<String, Integer>, String> keyed = wordAndOne.keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
             @Override
             public String getKey(Tuple2<String, Integer> tp) throws Exception {
                 return tp.f0;
