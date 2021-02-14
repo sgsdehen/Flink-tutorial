@@ -23,22 +23,22 @@ import java.util.HashSet;
 /**
  * @author ngt
  * @create 2021-02-01 12:02
- * * 用户id，活动id，事件类型(1浏览，2参与)
- * * user1,A,1
- * * User1,A,1
- * * User1,A,2
- * * User2,A,1
- * * User2,A,2
- * * User3,A,2
- * * User1,B,1
- * * User1,B,2
- * * User2,B,1
- * * User3,A,1
- * * User3,A,1
- * * User3,B,1
- * * User4,A,1
- * * User4,A,1
- * * 统计各个活动，事件的人数和次数
+ * 用户id，活动id，事件类型(1浏览，2参与)
+ * user1,A,1
+ * User1,A,1
+ * User1,A,2
+ * User2,A,1
+ * User2,A,2
+ * User3,A,2
+ * User1,B,1
+ * User1,B,2
+ * User2,B,1
+ * User3,A,1
+ * User3,A,1
+ * User3,B,1
+ * User4,A,1
+ * User4,A,1
+ * 统计各个活动，事件的人数和次数
  * <p>
  * INSERT,1,浏览
  * INSERT,2,参与
