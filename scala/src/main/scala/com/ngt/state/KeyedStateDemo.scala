@@ -36,13 +36,13 @@ object KeyedStateDemo {
     // this.keyContext.getCurrentKey()  CopyOnWriteStateMap
     wordAndOne.keyBy(_._1)
       .map(new RichMapFunction[(String, Int), (String, Int)] {
-        private val counter: ValueState[Int] =
+        lazy private val counter: ValueState[Int] =
           getRuntimeContext.getState(new ValueStateDescriptor[Int]("state", classOf[Int]))
 
         override def map(value: (String, Int)): (String, Int) = {
           val count: Int = value._2
           var historyCount: Int = counter.value()
-          if(historyCount ==null){
+          if (historyCount == null) {
             historyCount = 0
           }
           historyCount += count
