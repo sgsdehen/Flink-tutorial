@@ -57,7 +57,7 @@ public class CustomSourceDemo {
         }
     }
 
-    // 实现 SourceFunction 接口Source是多并行的，有限的数据量
+    // 实现 ParallelSourceFunction 接口Source是多并行的，有限的数据量
     public static class MySource2 implements ParallelSourceFunction<String> {
         @Override
         public void run(SourceContext<String> ctx) throws Exception {
