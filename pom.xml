@@ -15,7 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.12.1</flink.version>
+        <flink.version>1.12.2</flink.version>
         <target.java.version>11</target.java.version>
         <scala.binary.version>2.12</scala.binary.version>
         <maven.compiler.source>11</maven.compiler.source>
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-filesystem_${scala.binary.version}</artifactId>
-            <version>1.12-SNAPSHOT</version>
+            <version>1.11.3</version>
         </dependency>
 
         <dependency>

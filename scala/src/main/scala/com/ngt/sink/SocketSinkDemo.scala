@@ -13,7 +13,7 @@ object SocketSinkDemo {
     val lines: DataStream[String] = env.socketTextStream("192.168.31.8", 8888)
 
     lines.print()
-    lines.writeToSocket("192.168.31.8", 9999, new SimpleStringSchema());
+    lines.writeToSocket("192.168.31.8", 9999, new SimpleStringSchema())
     env.execute()
   }
 }
