@@ -75,9 +75,9 @@ object MyAtleastOnceSourceDemo {
 
       randomAccessFile.seek(offset)
       while (flag) {
-        val line: String = randomAccessFile.readLine()
+        var line: String = randomAccessFile.readLine()
         if (line != null) {
-          val line: String = new String(line.getBytes(Charsets.ISO_8859_1), Charsets.UTF_8)
+          line = new String(line.getBytes(Charsets.ISO_8859_1), Charsets.UTF_8)
           synchronized {
             offset = randomAccessFile.getFilePointer()
             ctx.collect(indexOfThisSubtask + ".txt: " + line)

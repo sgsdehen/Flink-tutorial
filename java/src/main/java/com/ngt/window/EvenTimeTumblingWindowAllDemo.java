@@ -33,7 +33,6 @@ public class EvenTimeTumblingWindowAllDemo {
             String[] split = data.split(",");
             return Tuple2.of(Long.valueOf(split[0]), Integer.valueOf(split[1]));
         }).returns(Types.TUPLE(Types.LONG, Types.INT));
-
         SingleOutputStreamOperator<Tuple2<Long, Integer>> operator =
                 timeAndCount.assignTimestampsAndWatermarks(WatermarkStrategy
                         .<Tuple2<Long, Integer>>forBoundedOutOfOrderness(Duration.ofSeconds(0))
