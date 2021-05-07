@@ -12,11 +12,6 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
-
-    <properties>
-
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.flink</groupId>

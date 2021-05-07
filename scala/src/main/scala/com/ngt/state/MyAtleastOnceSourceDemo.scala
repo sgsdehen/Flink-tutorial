@@ -5,10 +5,11 @@ import org.apache.flink.api.common.functions.MapFunction
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.common.state.{ListState, ListStateDescriptor}
 import org.apache.flink.api.common.time.Time
+import org.apache.flink.streaming.api.scala._
 import org.apache.flink.runtime.state.{FunctionInitializationContext, FunctionSnapshotContext}
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction
 import org.apache.flink.streaming.api.functions.source.{RichParallelSourceFunction, SourceFunction}
-import org.apache.flink.streaming.api.scala._
+
 
 import java.io.RandomAccessFile
 import java.util
@@ -75,9 +76,10 @@ object MyAtleastOnceSourceDemo {
 
       randomAccessFile.seek(offset)
       while (flag) {
-        val line: String = randomAccessFile.readLine()
+        var line: String = randomAccessFile.readLine()
         if (line != null) {
-          val line: String = new String(line.getBytes(Charsets.ISO_8859_1), Charsets.UTF_8)
+          //
+          line = new String(line.getBytes(Charsets.ISO_8859_1), Charsets.UTF_8)
           synchronized {
             offset = randomAccessFile.getFilePointer()
             ctx.collect(indexOfThisSubtask + ".txt: " + line)

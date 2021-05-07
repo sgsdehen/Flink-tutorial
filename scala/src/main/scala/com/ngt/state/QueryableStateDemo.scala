@@ -5,8 +5,6 @@ import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
 import org.apache.flink.api.common.time.Time
 import org.apache.flink.configuration.{Configuration, QueryableStateOptions}
-import org.apache.flink.streaming.api.datastream.{DataStreamSource, SingleOutputStreamOperator}
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.util.Collector
 
@@ -24,6 +22,7 @@ object QueryableStateDemo {
 
     env.enableCheckpointing(5000);
     env.setRestartStrategy(RestartStrategies.fixedDelayRestart(3, Time.seconds(3)));
+//    val lines: DataStream[String] = env.socketTextStream("192.168.31.8", 8888)
     val lines: DataStream[String] = env.socketTextStream("192.168.31.8", 8888)
 
     val wordAndOne: DataStream[(String, Int)] = lines.flatMap(new FlatMapFunction[String, (String, Int)] {
