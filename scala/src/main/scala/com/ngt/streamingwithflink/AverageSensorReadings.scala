@@ -1,13 +1,16 @@
 package com.ngt.streamingwithflink
 
 
-import com.ngt.streamingwithflink.util.{SensorReading, SensorSource, SensorTimeAssigner}
+import com.ngt.streamingwithflink.util.{SensorReading, SensorSource}
+import org.apache.flink.api.common.eventtime.{SerializableTimestampAssigner, WatermarkStrategy}
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.function.WindowFunction
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
+
+import java.time.Duration
 
 /**
  * @author ngt
@@ -23,12 +26,17 @@ object AverageSensorReadings {
 
     val sensorData: DataStream[SensorReading] = env
       .addSource(new SensorSource)
-      .assignTimestampsAndWatermarks(new SensorTimeAssigner)
+      .assignTimestampsAndWatermarks(WatermarkStrategy
+        .forBoundedOutOfOrderness[SensorReading](Duration.ZERO)
+        .withTimestampAssigner(new SerializableTimestampAssigner[SensorReading] {
+          override def extractTimestamp(element: SensorReading, recordTimestamp: Long): Long = element.timestamp
+        }))
+    //.assignTimestampsAndWatermarks(new SensorTimeAssigner)  该方法已经过时
 
 
     val avgTemp: DataStream[SensorReading] = sensorData
-      .map( r =>
-        SensorReading(r.id, r.timestamp, (r.temperature - 32) * (5.0 / 9.0)) )
+      .map(r =>
+        SensorReading(r.id, r.timestamp, (r.temperature - 32) * (5.0 / 9.0)))
       .keyBy(_.id)
       .window(TumblingEventTimeWindows.of(Time.seconds(1)))
       .apply(new TemperatureAverager)
