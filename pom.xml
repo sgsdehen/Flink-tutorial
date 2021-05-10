@@ -27,17 +27,17 @@
             </snapshots>
         </repository>
 
-        <!--        <repository>-->
-        <!--            <id>nexus-aliyun</id>-->
-        <!--            <name>nexus-aliyun</name>-->
-        <!--            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>-->
-        <!--            <releases>-->
-        <!--                <enabled>true</enabled>-->
-        <!--            </releases>-->
-        <!--            <snapshots>-->
-        <!--                <enabled>true</enabled>-->
-        <!--            </snapshots>-->
-        <!--        </repository>-->
+        <repository>
+            <id>nexus-aliyun</id>
+            <name>nexus-aliyun</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <properties>
@@ -122,8 +122,8 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-filesystem_${scala.binary.version}</artifactId>
-            <!--            <version>1.12-SNAPSHOT</version>-->
-            <version>1.11.3</version>
+            <version>1.12-SNAPSHOT</version>
+            <!--            <version>1.11.3</version>-->
         </dependency>
 
         <dependency>
