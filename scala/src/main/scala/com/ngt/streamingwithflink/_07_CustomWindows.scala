@@ -90,30 +90,25 @@ class OneSecondIntervalTrigger extends Trigger[SensorReading, TimeWindow] {
     TriggerResult.CONTINUE
   }
 
-  override def onProcessingTime(time: Long,
-                                window: TimeWindow,
-                                ctx: Trigger.TriggerContext): TriggerResult = {
-    TriggerResult.CONTINUE
+  override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
+    TriggerResult.CONTINUE // 不使用处理时间计时器
   }
 
-  override def onEventTime(time: Long,
-                           window: TimeWindow,
-                           ctx: Trigger.TriggerContext): TriggerResult = {
+  override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
     // 进行最终计算并清除窗口状态
     if (time == window.getEnd) {
-      TriggerResult.FIRE_AND_PURGE
+      TriggerResult.FIRE_AND_PURGE  // 先计算再删除
     } else {
       // 注册下一个用于提前触发的计时器
-      val t = ctx.getCurrentWatermark + (1000 - (ctx.getCurrentWatermark % 1000))
+      val t: Long = ctx.getCurrentWatermark + (1000 - (ctx.getCurrentWatermark % 1000))
       if (t < window.getEnd) {
         ctx.registerEventTimeTimer(t)
       }
-      TriggerResult.FIRE
+      TriggerResult.FIRE   // 执行计算
     }
   }
 
-  override def clear(window: TimeWindow,
-                     ctx: Trigger.TriggerContext): Unit = {
+  override def clear(window: TimeWindow, ctx: Trigger.TriggerContext): Unit = {
     val firstSeen: ValueState[Boolean] = ctx.getPartitionedState(
       new ValueStateDescriptor[Boolean]("firstSeen", classOf[Boolean]))
     firstSeen.clear()
