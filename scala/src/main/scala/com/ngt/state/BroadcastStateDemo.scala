@@ -28,7 +28,6 @@ import scala.collection.mutable
  * User4,A,1
  * User4,A,1
  * 统计各个活动，事件的人数和次数
- * <p>
  * INSERT,1,浏览
  * INSERT,2,参与
  * INSERT,3,消费
@@ -100,9 +99,9 @@ object BroadcastStateDemo {
 
     override def processBroadcastElement(value: (String, String, String), ctx: KeyedBroadcastProcessFunction[(String, String), (String, String, String),
       (String, String, String), (String, String, Long, Long)]#Context, out: Collector[(String, String, Long, Long)]): Unit = {
-      val type1 = value._1
-      val actId = value._2
-      val actName = value._3
+      val type1: String = value._1
+      val actId: String = value._2
+      val actName: String = value._3
 
       val broadcastState: BroadcastState[String, String] = ctx.getBroadcastState(stateDescriptor)
       if ("DELETE".equals(type1)) {
