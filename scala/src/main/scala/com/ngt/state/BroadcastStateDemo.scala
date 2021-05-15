@@ -75,8 +75,9 @@ object BroadcastStateDemo {
       getRuntimeContext.getState(new ValueStateDescriptor[mutable.HashSet[String]]("state1", TypeInformation.of(classOf[mutable.HashSet[String]])))
 
 
-    override def processElement(value: (String, String, String), ctx: KeyedBroadcastProcessFunction[(String, String), (String, String, String),
-      (String, String, String), (String, String, Long, Long)]#ReadOnlyContext, out: Collector[(String, String, Long, Long)]): Unit = {
+    override def processElement(value: (String, String, String),
+                                ctx: KeyedBroadcastProcessFunction[(String, String), (String, String, String), (String, String, String), (String, String, Long, Long)]#ReadOnlyContext,
+                                out: Collector[(String, String, Long, Long)]): Unit = {
       val broadcastState: ReadOnlyBroadcastState[String, String] = ctx.getBroadcastState(stateDescriptor)
       var historyCount: Long = countState.value()
       if (historyCount == null) {
@@ -97,8 +98,9 @@ object BroadcastStateDemo {
       out.collect((value._2, actName, historyCount, user.size.toLong))
     }
 
-    override def processBroadcastElement(value: (String, String, String), ctx: KeyedBroadcastProcessFunction[(String, String), (String, String, String),
-      (String, String, String), (String, String, Long, Long)]#Context, out: Collector[(String, String, Long, Long)]): Unit = {
+    override def processBroadcastElement(value: (String, String, String),
+                                         ctx: KeyedBroadcastProcessFunction[(String, String), (String, String, String),  (String, String, String), (String, String, Long, Long)]#Context,
+                                         out: Collector[(String, String, Long, Long)]): Unit = {
       val type1: String = value._1
       val actId: String = value._2
       val actName: String = value._3
