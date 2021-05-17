@@ -89,7 +89,6 @@ class PeriodicAssigner extends WatermarkGenerator[SensorReading] {
 }
 
 // 定点水位分配器
-
 class PunctuatedAssigner extends WatermarkGenerator[SensorReading] {
   val maxOutOfOrderness: Long = 60 * 1000
 

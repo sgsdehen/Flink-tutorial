@@ -17,8 +17,6 @@ object _03_ProcessFunctionTimers {
 
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
-    env.getConfig.setAutoWatermarkInterval(1000L)
-
     val readings: DataStream[SensorReading] = env
       .addSource(new SensorSource)
 
