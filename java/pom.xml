@@ -17,12 +17,6 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>com.ngt</groupId>
-            <artifactId>scala</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
 
     <build>
