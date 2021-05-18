@@ -44,40 +44,41 @@ public class _02_WatermarkGeneration {
         env.execute();
 
     }
-}
 
+    // 周期性水位线分配器
+    private static class PeriodicAssigner implements WatermarkGenerator<SensorReading> {
 
-// 周期性水位线分配器
-class PeriodicAssigner implements WatermarkGenerator<SensorReading> {
+        private static final long maxOutOfOrderness = 60 * 1000L;
+        private long currentMaxTimestamp = 0;
 
-    private static final long maxOutOfOrderness = 60 * 1000L;
-    private long currentMaxTimestamp = 0;
+        @Override
+        public void onEvent(SensorReading event, long eventTimestamp, WatermarkOutput output) {
+            currentMaxTimestamp = Math.max(currentMaxTimestamp, event.timestamp);
+        }
 
-    @Override
-    public void onEvent(SensorReading event, long eventTimestamp, WatermarkOutput output) {
-        currentMaxTimestamp = Math.max(currentMaxTimestamp, event.timestamp);
-    }
-
-    @Override
-    public void onPeriodicEmit(WatermarkOutput output) {
-        output.emitWatermark(new Watermark(currentMaxTimestamp - maxOutOfOrderness - 1));
-    }
-}
-
-// 定点水位分配器
-
-class PunctuatedAssigner implements WatermarkGenerator<SensorReading> {
-    private static final long maxOutOfOrderness = 60 * 1000L;
-
-    @Override
-    public void onEvent(SensorReading event, long eventTimestamp, WatermarkOutput output) {
-        if (event.id == "sensor_1") {
-            output.emitWatermark(new Watermark(event.timestamp - maxOutOfOrderness - 1));
+        @Override
+        public void onPeriodicEmit(WatermarkOutput output) {
+            output.emitWatermark(new Watermark(currentMaxTimestamp - maxOutOfOrderness - 1));
         }
     }
 
-    @Override
-    public void onPeriodicEmit(WatermarkOutput output) {
-        // 无需实现
+// 定点水位分配器
+
+   private static class PunctuatedAssigner implements WatermarkGenerator<SensorReading> {
+        private static final long maxOutOfOrderness = 60 * 1000L;
+
+        @Override
+        public void onEvent(SensorReading event, long eventTimestamp, WatermarkOutput output) {
+            if (event.id == "sensor_1") {
+                output.emitWatermark(new Watermark(event.timestamp - maxOutOfOrderness - 1));
+            }
+        }
+
+        @Override
+        public void onPeriodicEmit(WatermarkOutput output) {
+            // 无需实现
+        }
     }
 }
+
+

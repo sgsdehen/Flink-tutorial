@@ -68,6 +68,7 @@ public class ActivityCount {
 
                 ValueStateDescriptor<HashSet<String>> descriptor2 = new ValueStateDescriptor<>("state2", TypeInformation.of(new TypeHint<HashSet<String>>() {
                 }));
+
                 userState = getRuntimeContext().getState(descriptor2);
 
             }

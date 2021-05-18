@@ -40,11 +40,11 @@ object _05_CoProcessFunctionTimers {
 class ReadingFilter extends CoProcessFunction[SensorReading, (String, Long), SensorReading] {
 
   private lazy val forwardingEnabled: ValueState[Boolean] =
-    getRuntimeContext.getState(new ValueStateDescriptor[Boolean](("filterSwitch"), classOf[Boolean]))
+    getRuntimeContext.getState(new ValueStateDescriptor[Boolean]("filterSwitch", classOf[Boolean]))
 
 
   private lazy val disableTimer: ValueState[Long] =
-    getRuntimeContext.getState(new ValueStateDescriptor[Long](("timer"), classOf[Long]))
+    getRuntimeContext.getState(new ValueStateDescriptor[Long]("timer", classOf[Long]))
 
   override def processElement1(value: SensorReading,
                                ctx: CoProcessFunction[SensorReading, (String, Long), SensorReading]#Context,

@@ -48,23 +48,24 @@ public class _01_AverageSensorReadings {
     }
 
 
-}
+    private static class TemperatureAverager implements WindowFunction<SensorReading, SensorReading, String, TimeWindow> {
+        @Override
+        public void apply(String s,
+                          TimeWindow window,
+                          Iterable<SensorReading> input,
+                          Collector<SensorReading> out) throws Exception {
 
-class TemperatureAverager implements WindowFunction<SensorReading, SensorReading, String, TimeWindow> {
-    @Override
-    public void apply(String s,
-                      TimeWindow window,
-                      Iterable<SensorReading> input,
-                      Collector<SensorReading> out) throws Exception {
+            int cnt = 0;
+            double sum = 0.0;
+            for (SensorReading r : input) {
+                cnt++;
+                sum += r.temperature;
+            }
+            double avgTemp = sum / cnt;
 
-        int cnt = 0;
-        double sum = 0.0;
-        for (SensorReading r : input) {
-            cnt++;
-            sum += r.temperature;
+            out.collect(new SensorReading(s, window.getEnd(), avgTemp));
         }
-        double avgTemp = sum / cnt;
-
-        out.collect(new SensorReading(s, window.getEnd(), avgTemp));
     }
+
 }
+

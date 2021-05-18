@@ -34,18 +34,19 @@ public class _04_SideOutputs {
 
         env.execute();
     }
-}
 
-class FreezingMonitor extends ProcessFunction<SensorReading, SensorReading> {
-    private final OutputTag<String> freezingAlarmOutput = new OutputTag<>("freezing-alarms");
+    private static  class FreezingMonitor extends ProcessFunction<SensorReading, SensorReading> {
+        private final OutputTag<String> freezingAlarmOutput = new OutputTag<>("freezing-alarms");
 
-    @Override
-    public void processElement(SensorReading value,
-                               Context ctx,
-                               Collector<SensorReading> out) throws Exception {
-        if (value.temperature < 32.0) {
-            ctx.output(freezingAlarmOutput, "Freezing Alarm for " + value.id + " temperature is " + value.temperature);
+        @Override
+        public void processElement(SensorReading value,
+                                   Context ctx,
+                                   Collector<SensorReading> out) throws Exception {
+            if (value.temperature < 32.0) {
+                ctx.output(freezingAlarmOutput, "Freezing Alarm for " + value.id + " temperature is " + value.temperature);
+            }
+            out.collect(value);
         }
-        out.collect(value);
     }
 }
+

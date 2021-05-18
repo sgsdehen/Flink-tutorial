@@ -85,6 +85,7 @@ object _06_WindowFunctions {
         .withTimestampAssigner(new SerializableTimestampAssigner[SensorReading] {
           override def extractTimestamp(element: SensorReading, recordTimestamp: Long): Long = element.timestamp
         }))
+      // 因为 ReduceFunction 的输入和输出的类型必须保持一致，因此要进行类型转换
       .map(r => (r.id, r.temperature, r.temperature))
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(5)))

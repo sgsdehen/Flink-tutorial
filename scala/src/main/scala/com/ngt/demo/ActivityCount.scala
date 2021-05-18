@@ -1,7 +1,7 @@
 package com.ngt.demo
 
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
-import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.api.common.typeinfo.{TypeHint, TypeInformation}
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
 import org.apache.flink.streaming.api.scala._
@@ -32,7 +32,8 @@ object ActivityCount {
 
       override def open(parameters: Configuration): Unit = {
         countState = getRuntimeContext.getState(new ValueStateDescriptor[Long]("state1", classOf[Long]))
-        userState = getRuntimeContext.getState(new ValueStateDescriptor[mutable.HashSet[String]]("state1", TypeInformation.of(classOf[mutable.HashSet[String]])))
+//        userState = getRuntimeContext.getState(new ValueStateDescriptor[mutable.HashSet[String]]("state1", TypeInformation.of(classOf[mutable.HashSet[String]])))
+        userState = getRuntimeContext.getState(new ValueStateDescriptor[mutable.HashSet[String]]("state1", TypeInformation.of(new TypeHint[mutable.HashSet[String]] {})))
       }
 
       override def processElement(value: (String, String, String), ctx: KeyedProcessFunction[(String, String), (String, String, String), (String, String, Long, Long)]#Context, out: Collector[(String, String, Long, Long)]): Unit = {

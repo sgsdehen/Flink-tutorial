@@ -33,9 +33,9 @@ object _07_CustomWindows {
           override def extractTimestamp(element: SensorReading, recordTimestamp: Long): Long = element.timestamp
         }))
       .keyBy(_.id)
-      .window(new ThirtySecondsWindows)
-      .trigger(new OneSecondIntervalTrigger)
-      .process(new CountFunction)
+      .window(new ThirtySecondsWindows)       // 窗口分配器
+      .trigger(new OneSecondIntervalTrigger)  // 可选项：指定分类器
+      .process(new CountFunction)             // 指定窗口函数
       .print()
 
     env.execute()
@@ -77,6 +77,7 @@ class OneSecondIntervalTrigger extends Trigger[SensorReading, TimeWindow] {
   override def onElement(element: SensorReading,
                          timestamp: Long, window: TimeWindow,
                          ctx: Trigger.TriggerContext): TriggerResult = {
+    // 获取一个作用域为触发器键值和当前窗口的状态对象
     val firstSeen: ValueState[Boolean] = ctx.getPartitionedState(
       new ValueStateDescriptor[Boolean]("firstSeen", classOf[Boolean]))
     if (!firstSeen.value()) {
