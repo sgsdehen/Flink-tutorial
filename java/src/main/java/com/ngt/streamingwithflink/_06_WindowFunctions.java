@@ -2,6 +2,7 @@ package com.ngt.streamingwithflink;
 
 import com.ngt.streamingwithflink.util.SensorReading;
 import com.ngt.streamingwithflink.util.SensorSource;
+import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
@@ -31,7 +32,12 @@ public class _06_WindowFunctions {
 		env.addSource(new SensorSource())
 				.assignTimestampsAndWatermarks(WatermarkStrategy
 						.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(1))
-						.withTimestampAssigner((element, timestamp) -> element.timestamp))
+						.withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+							@Override
+							public long extractTimestamp(SensorReading element, long recordTimestamp) {
+								return element.timestamp;
+							}
+						}))
 				.map(data -> Tuple2.of(data.id, data.temperature))
 				.keyBy(data -> data.f0)
 				.window(TumblingEventTimeWindows.of(Time.seconds(3)))
@@ -42,7 +48,12 @@ public class _06_WindowFunctions {
 		env.addSource(new SensorSource())
 				.assignTimestampsAndWatermarks(WatermarkStrategy
 						.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(1))
-						.withTimestampAssigner((element, timestamp) -> element.timestamp))
+						.withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+							@Override
+							public long extractTimestamp(SensorReading element, long recordTimestamp) {
+								return element.timestamp;
+							}
+						}))
 				.map(data -> Tuple2.of(data.id, data.temperature))
 				.keyBy(data -> data.f0)
 				.window(TumblingEventTimeWindows.of(Time.seconds(3)))
@@ -53,7 +64,12 @@ public class _06_WindowFunctions {
 		env.addSource(new SensorSource())
 				.assignTimestampsAndWatermarks(WatermarkStrategy
 						.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(1))
-						.withTimestampAssigner((element, timestamp) -> element.timestamp))
+						.withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+							@Override
+							public long extractTimestamp(SensorReading element, long recordTimestamp) {
+								return element.timestamp;
+							}
+						}))
 				.map(data -> Tuple2.of(data.id, data.temperature))
 				.keyBy(data -> data.f0)
 				.window(TumblingEventTimeWindows.of(Time.seconds(3)))
@@ -65,7 +81,12 @@ public class _06_WindowFunctions {
 		env.addSource(new SensorSource())
 				.assignTimestampsAndWatermarks(WatermarkStrategy
 						.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(1))
-						.withTimestampAssigner((element, timestamp) -> element.timestamp))
+						.withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+							@Override
+							public long extractTimestamp(SensorReading element, long recordTimestamp) {
+								return element.timestamp;
+							}
+						}))
 				.keyBy(data -> data.id)
 				.window(TumblingEventTimeWindows.of(Time.seconds(5)))
 				.process(new HighAndLowTempProcessFunction())
@@ -75,7 +96,12 @@ public class _06_WindowFunctions {
 		env.addSource(new SensorSource())
 				.assignTimestampsAndWatermarks(WatermarkStrategy
 						.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(1))
-						.withTimestampAssigner((element, timestamp) -> element.timestamp))
+						.withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+							@Override
+							public long extractTimestamp(SensorReading element, long recordTimestamp) {
+								return element.timestamp;
+							}
+						}))
 				// 因为 ReduceFunction 的输入和输出的类型必须保持一致，因此要进行类型转换
 				.map(r -> Tuple3.of(r.id, r.temperature, r.temperature))
 				.keyBy(data -> data.f0)

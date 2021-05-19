@@ -28,12 +28,22 @@ public class _02_WatermarkGeneration {
 
         readings.assignTimestampsAndWatermarks(WatermarkStrategy
                 .<SensorReading>forMonotonousTimestamps()
-                .withTimestampAssigner((data, timestamp) -> data.timestamp));
+                .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+                    @Override
+                    public long extractTimestamp(SensorReading element, long recordTimestamp) {
+                        return element.timestamp;
+                    }
+                }));
 
         // 3. 提前知道最大延迟
         readings.assignTimestampsAndWatermarks(WatermarkStrategy
                 .<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                .withTimestampAssigner((data, timestamp) -> data.timestamp));
+                .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+                    @Override
+                    public long extractTimestamp(SensorReading element, long recordTimestamp) {
+                        return element.timestamp;
+                    }
+                }));
 
         // 4. 处理空闲数据源
         readings.assignTimestampsAndWatermarks(WatermarkStrategy

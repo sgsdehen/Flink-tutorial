@@ -2,6 +2,7 @@ package com.ngt.streamingwithflink;
 
 import com.ngt.streamingwithflink.util.SensorReading;
 import com.ngt.streamingwithflink.util.SensorSource;
+import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -27,7 +28,12 @@ public class _01_AverageSensorReadings {
                 .addSource(new SensorSource())
                 .assignTimestampsAndWatermarks(WatermarkStrategy
                         .<SensorReading>forBoundedOutOfOrderness(Duration.ZERO)
-                        .withTimestampAssigner((element, timestamp) -> element.timestamp));
+                        .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+                            @Override
+                            public long extractTimestamp(SensorReading element, long recordTimestamp) {
+                                return element.timestamp;
+                            }
+                        }));
 
 
         env.addSource(new SensorSource())

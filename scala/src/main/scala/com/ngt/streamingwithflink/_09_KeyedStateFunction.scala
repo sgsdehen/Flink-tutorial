@@ -23,7 +23,6 @@ object _09_KeyedStateFunction {
 
     val sensorData: DataStream[SensorReading] = env
       .addSource(new SensorSource)
-      .map(new TimestampShuffler(7 * 1000))
       .assignTimestampsAndWatermarks(WatermarkStrategy
         .forBoundedOutOfOrderness[SensorReading](Duration.ofSeconds(5))
         .withTimestampAssigner(new SerializableTimestampAssigner[SensorReading] {
@@ -35,7 +34,7 @@ object _09_KeyedStateFunction {
       .flatMap(new TemperatureAlertFunction(1.7))
       .print()
 
-    // 利用flatMapState实现只有一个键值分区的ValueState的FlatMap
+    // 利用flatMapState实现只有一个键值分区的 ValueState 的 FlatMap
     sensorData
       .keyBy(_.id)
       .flatMapWithState[(String, Double, Double), Double] {

@@ -2,6 +2,7 @@ package com.ngt.streamingwithflink;
 
 import com.ngt.streamingwithflink.util.SensorReading;
 import com.ngt.streamingwithflink.util.SensorSource;
+import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -27,7 +28,12 @@ public class _04_SideOutputs {
                 .addSource(new SensorSource())
                 .assignTimestampsAndWatermarks(WatermarkStrategy
                         .<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                        .withTimestampAssigner((element, timestamp) -> element.timestamp));
+                        .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
+                            @Override
+                            public long extractTimestamp(SensorReading element, long recordTimestamp) {
+                                return element.timestamp;
+                            }
+                        }));
 
         sensorData.process(new FreezingMonitor())
                 .print();
