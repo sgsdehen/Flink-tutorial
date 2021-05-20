@@ -35,12 +35,7 @@ public class _07_CustomWindows {
 		env.addSource(new SensorSource())
 				.assignTimestampsAndWatermarks(WatermarkStrategy
 						.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(1))
-						.withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
-							@Override
-							public long extractTimestamp(SensorReading element, long recordTimestamp) {
-								return element.timestamp;
-							}
-						}))
+						.withTimestampAssigner((element, recordTimestamp) -> element.timestamp))
 				.keyBy(data ->data.id)
 				// 窗口分配器
 				.window(new ThirtySecondsWindows())

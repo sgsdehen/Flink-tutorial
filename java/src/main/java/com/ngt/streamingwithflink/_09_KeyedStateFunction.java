@@ -21,56 +21,51 @@ import java.time.Duration;
  * @create 2021-05-19 21:57
  */
 public class _09_KeyedStateFunction {
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.getConfig().setAutoWatermarkInterval(500L);
+		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+		env.getConfig().setAutoWatermarkInterval(500L);
 
-        SingleOutputStreamOperator<SensorReading> sensorData = env.addSource(new SensorSource())
-                .assignTimestampsAndWatermarks(WatermarkStrategy
-                        .<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                        .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
-                            @Override
-                            public long extractTimestamp(SensorReading element, long recordTimestamp) {
-                                return element.timestamp;
-                            }
-                        }));
+		SingleOutputStreamOperator<SensorReading> sensorData = env.addSource(new SensorSource())
+				.assignTimestampsAndWatermarks(WatermarkStrategy
+						.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(5))
+						.withTimestampAssigner((element, recordTimestamp) -> element.timestamp));
 
-        sensorData
-                .keyBy(data -> data.id)
-                .flatMap(new TemperatureAlertFunction(1.7))
-                .print();
+		sensorData
+				.keyBy(data -> data.id)
+				.flatMap(new TemperatureAlertFunction(1.7))
+				.print();
 
-        // 利用flatMapState实现  java未提供该实现
-    }
+		// 利用flatMapState实现  java未提供该实现
+	}
 
 
-    // 使用flatMap是因为可能没有输出
-    static class TemperatureAlertFunction extends RichFlatMapFunction<SensorReading, Tuple3<String, Double, Double>> {
-        private Double threshold;
+	// 使用flatMap是因为可能没有输出
+	static class TemperatureAlertFunction extends RichFlatMapFunction<SensorReading, Tuple3<String, Double, Double>> {
+		private Double threshold;
 
-        public TemperatureAlertFunction(Double threshold) {
-            this.threshold = threshold;
-        }
+		public TemperatureAlertFunction(Double threshold) {
+			this.threshold = threshold;
+		}
 
-        public TemperatureAlertFunction() {
-        }
+		public TemperatureAlertFunction() {
+		}
 
-        private transient ValueState<Double> lastTempState;
+		private transient ValueState<Double> lastTempState;
 
-        @Override
-        public void open(Configuration parameters) throws Exception {
-            lastTempState = getRuntimeContext().getState(new ValueStateDescriptor<Double>("lastTemp", Double.class));
-        }
+		@Override
+		public void open(Configuration parameters) throws Exception {
+			lastTempState = getRuntimeContext().getState(new ValueStateDescriptor<Double>("lastTemp", Double.class));
+		}
 
-        @Override
-        public void flatMap(SensorReading value, Collector<Tuple3<String, Double, Double>> out) throws Exception {
-            Double lastTmep = lastTempState.value();
-            Double tempDiff = Math.abs(value.temperature - lastTmep);
+		@Override
+		public void flatMap(SensorReading value, Collector<Tuple3<String, Double, Double>> out) throws Exception {
+			Double lastTmep = lastTempState.value();
+			Double tempDiff = Math.abs(value.temperature - lastTmep);
 
-            if (tempDiff > threshold) {
-                out.collect(Tuple3.of(value.id, value.temperature, tempDiff));
-            }
-        }
-    }
+			if (tempDiff > threshold) {
+				out.collect(Tuple3.of(value.id, value.temperature, tempDiff));
+			}
+		}
+	}
 }

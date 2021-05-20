@@ -39,12 +39,7 @@ public class _08_lateReadingsOutput {
                 .map(new TimestampShuffler(7 * 1000))
                 .assignTimestampsAndWatermarks(WatermarkStrategy
                         .<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                        .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
-                            @Override
-                            public long extractTimestamp(SensorReading element, long recordTimestamp) {
-                                return element.timestamp;
-                            }
-                        }));
+                        .withTimestampAssigner((element, recordTimestamp) -> element.timestamp));
 
         // 1. 使用ProcessFunction过滤出延迟读数(到侧输出)
         filterLateReadings(outOfOrderReadings);

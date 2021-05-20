@@ -28,12 +28,7 @@ public class _01_AverageSensorReadings {
                 .addSource(new SensorSource())
                 .assignTimestampsAndWatermarks(WatermarkStrategy
                         .<SensorReading>forBoundedOutOfOrderness(Duration.ZERO)
-                        .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
-                            @Override
-                            public long extractTimestamp(SensorReading element, long recordTimestamp) {
-                                return element.timestamp;
-                            }
-                        }));
+                        .withTimestampAssigner((element, recordTimestamp) -> element.timestamp));
 
 
         env.addSource(new SensorSource())

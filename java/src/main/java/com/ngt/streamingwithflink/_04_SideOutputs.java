@@ -18,41 +18,36 @@ import java.time.Duration;
  */
 public class _04_SideOutputs {
 
-    public static void main(String[] args) throws Exception {
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+	public static void main(String[] args) throws Exception {
+		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        env.getConfig().setAutoWatermarkInterval(1000L);
-        env.getCheckpointConfig().setCheckpointInterval(10 * 1000L);
+		env.getConfig().setAutoWatermarkInterval(1000L);
+		env.getCheckpointConfig().setCheckpointInterval(10 * 1000L);
 
-        SingleOutputStreamOperator<SensorReading> sensorData = env
-                .addSource(new SensorSource())
-                .assignTimestampsAndWatermarks(WatermarkStrategy
-                        .<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                        .withTimestampAssigner(new SerializableTimestampAssigner<SensorReading>() {
-                            @Override
-                            public long extractTimestamp(SensorReading element, long recordTimestamp) {
-                                return element.timestamp;
-                            }
-                        }));
+		SingleOutputStreamOperator<SensorReading> sensorData = env
+				.addSource(new SensorSource())
+				.assignTimestampsAndWatermarks(WatermarkStrategy
+						.<SensorReading>forBoundedOutOfOrderness(Duration.ofSeconds(5))
+						.withTimestampAssigner((element, recordTimestamp) -> element.timestamp));
 
-        sensorData.process(new FreezingMonitor())
-                .print();
+		sensorData.process(new FreezingMonitor())
+				.print();
 
-        env.execute();
-    }
+		env.execute();
+	}
 
-    private static  class FreezingMonitor extends ProcessFunction<SensorReading, SensorReading> {
-        private final OutputTag<String> freezingAlarmOutput = new OutputTag<>("freezing-alarms");
+	private static class FreezingMonitor extends ProcessFunction<SensorReading, SensorReading> {
+		private final OutputTag<String> freezingAlarmOutput = new OutputTag<>("freezing-alarms");
 
-        @Override
-        public void processElement(SensorReading value,
-                                   Context ctx,
-                                   Collector<SensorReading> out) throws Exception {
-            if (value.temperature < 32.0) {
-                ctx.output(freezingAlarmOutput, "Freezing Alarm for " + value.id + " temperature is " + value.temperature);
-            }
-            out.collect(value);
-        }
-    }
+		@Override
+		public void processElement(SensorReading value,
+								   Context ctx,
+								   Collector<SensorReading> out) throws Exception {
+			if (value.temperature < 32.0) {
+				ctx.output(freezingAlarmOutput, "Freezing Alarm for " + value.id + " temperature is " + value.temperature);
+			}
+			out.collect(value);
+		}
+	}
 }
 
