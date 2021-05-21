@@ -1,18 +1,23 @@
-package com.ngt.UserBehaviorAnalysis
+package com.ngt.demo.networkflow
 
 import org.apache.flink.api.common.eventtime.{SerializableTimestampAssigner, WatermarkStrategy}
 import org.apache.flink.api.common.functions.AggregateFunction
+import org.apache.flink.api.common.state.{ListState, ListStateDescriptor, MapState, MapStateDescriptor}
+import org.apache.flink.api.scala.typeutils.Types
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
-import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
-import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.function.WindowFunction
+import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
+import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.time.Duration
+import java.util
+import java.util.concurrent.TimeUnit
+import scala.collection.mutable.ListBuffer
 
 /**
  * @author ngt
@@ -91,16 +96,51 @@ class PageViewCountWindowResult() extends WindowFunction[Long, PageViewCount, St
 
 class TopNHotPages(n: Int) extends KeyedProcessFunction[Long, PageViewCount, String] {
 
+  private lazy val pageViewCountMapState: MapState[String, Long] =
+    getRuntimeContext.getMapState(new MapStateDescriptor[String, Long]("pageViewCount-map", classOf[String], classOf[Long]))
+
+
+  // 此处也可以使用ListState直接保留PageViewCount类型但是其读写效率不如 MapState 高
+  lazy val urlState: ListState[PageViewCount] =
+    getRuntimeContext.getListState(new ListStateDescriptor[PageViewCount]("urlState-state", Types.of[PageViewCount]))
 
   override def processElement(value: PageViewCount,
                               ctx: KeyedProcessFunction[Long, PageViewCount, String]#Context,
                               out: Collector[String]): Unit = {
-
+    pageViewCountMapState.put(value.url, value.count)
+    ctx.timerService().registerEventTimeTimer(value.windowEnd + 1)
+    // 另外注册一个定时器用于处理容忍的延迟，1分钟之后触发，这时窗口已经彻底关闭，不再有聚合结果输出，可以清空状态
+    ctx.timerService().registerEventTimeTimer(value.windowEnd + 60000L)
   }
 
   override def onTimer(timestamp: Long,
                        ctx: KeyedProcessFunction[Long, PageViewCount, String]#OnTimerContext,
                        out: Collector[String]): Unit = {
+    if (ctx.getCurrentKey + 60000L == timestamp) {
+      pageViewCountMapState.clear()
+      return
+    }
+    val allPageViewCounts: ListBuffer[(String, Long)] = ListBuffer()
+
+    val iter: util.Iterator[util.Map.Entry[String, Long]] = pageViewCountMapState.entries().iterator()
+    while (iter.hasNext) {
+      val entry: util.Map.Entry[String, Long] = iter.next()
+      allPageViewCounts += ((entry.getKey, entry.getValue))
+    }
+    val sortedPageViewCounts: ListBuffer[(String, Long)] = allPageViewCounts.sortWith(_._2 > _._2).take(n)
+    val result: StringBuilder = new StringBuilder
+    result.append("====================================\n")
+    result.append("窗口结束时间：").append(new Timestamp(timestamp - 1)).append("\n")
+
+    for (i <- sortedPageViewCounts.indices) {
+      val currentItemViewCount = sortedPageViewCounts(i)
+      result.append("NO").append(i + 1).append(":\t")
+        .append("页面URL = ").append(currentItemViewCount._1).append("\t")
+        .append("热门度 = ").append(currentItemViewCount._2).append("\n")
+    }
+    result.append("\n==================================\n\n")
+    TimeUnit.MILLISECONDS.sleep(100L)
+    out.collect(result.toString())
   }
 
 
