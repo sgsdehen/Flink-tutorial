@@ -49,6 +49,7 @@ public class _09_KeyedStateFunction {
 		}
 
 		public TemperatureAlertFunction() {
+
 		}
 
 		private transient ValueState<Double> lastTempState;
