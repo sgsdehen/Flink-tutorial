@@ -3,11 +3,9 @@ package com.ngt.demo.networkflow
 import com.ngt.demo.userbehavior.UserBehavior
 import org.apache.flink.api.common.functions.{AggregateFunction, MapFunction}
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
-import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
-import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
-import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.function.WindowFunction
+import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
@@ -17,16 +15,17 @@ import scala.util.Random
 
 /**
  * @author ngt
- * @create 2021-05-21 21:47
+ * @date 2021-05-21 21:47
+ * 实现一个网站总浏览量的统计。我们可以设置滚动时间窗口，实时统计每小时内的网站PV
  */
 object PageView {
   def main(args: Array[String]): Unit = {
-    val env = StreamExecutionEnvironment.getExecutionEnvironment
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+    val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
     val inputStream: DataStream[String] = env.readTextFile("data/UserBehavior.csv")
+
     val dataStream: DataStream[UserBehavior] = inputStream.map(data => {
-      val arr = data.split(",")
+      val arr: Array[String] = data.split(",")
       UserBehavior(arr(0).toLong, arr(1).toLong, arr(2).toInt, arr(3), arr(4).toLong)
     }
     )
@@ -39,9 +38,10 @@ object PageView {
       .window(TumblingEventTimeWindows.of(Time.minutes(60)))
       .aggregate(new PvCountAgg(), new PvCountWindowResult())
 
-    val totalPvStream = pvStream
+    val totalPvStream: DataStream[PvCount] = pvStream
       .keyBy(_.windowEnd)
       .process(new TotalPvCountResult())
+
 
     totalPvStream.print("totalPvStream")
 
@@ -49,10 +49,10 @@ object PageView {
       .filter(_.behavior == "pv")
       .map(new MyMapper())
       .keyBy(_._1)
-      .timeWindow(Time.minutes(60))
+      .window(TumblingEventTimeWindows.of(Time.minutes(60)))
       .aggregate(new PvCountAgg(), new PvCountWindowResult())
 
-    val totalPvStream1 = pvStream1
+    val totalPvStream1: DataStream[PvCount] = pvStream1
       .keyBy(_.windowEnd)
       .process(new TotalPvCountResult())
 

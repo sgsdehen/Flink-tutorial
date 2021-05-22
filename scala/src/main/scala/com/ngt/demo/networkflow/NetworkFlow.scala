@@ -22,6 +22,7 @@ import scala.collection.mutable.ListBuffer
 /**
  * @author ngt
  * @create 2021-05-21 18:37
+ * 每隔5秒，输出最近10分钟内访问量最多的前N个URL
  */
 object ApacheLogAnalysis {
   def main(args: Array[String]): Unit = {

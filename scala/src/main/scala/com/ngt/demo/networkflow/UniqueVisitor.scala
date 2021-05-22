@@ -13,14 +13,15 @@ import org.apache.flink.util.Collector
 /**
  * @author ngt
  * @create 2021-05-21 22:00
+ * 计算独立访客的数量
  */
 object UniqueVisitor {
   def main(args: Array[String]): Unit = {
-    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     val inputStream: DataStream[String] = env.readTextFile("data/UserBehavior.csv")
     val dataStream: DataStream[UserBehavior] = inputStream.map(data => {
-      val arr = data.split(",")
+      val arr: Array[String] = data.split(",")
       UserBehavior(arr(0).toLong, arr(1).toLong, arr(2).toInt, arr(3), arr(4).toLong)
     }
     )
