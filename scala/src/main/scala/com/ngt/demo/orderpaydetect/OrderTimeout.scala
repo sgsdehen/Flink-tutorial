@@ -20,7 +20,7 @@ object OrderTimeout {
     env.setParallelism(1)
     env.getConfig.setAutoWatermarkInterval(1000L)
 
-    val inputStream: DataStream[String] = env.readTextFile("data/LoginLog.csv")
+    val inputStream: DataStream[String] = env.readTextFile("data/OrderLog.csv")
 
     val orderEventStream: DataStream[OrderEvent] = inputStream
       .map(data => {

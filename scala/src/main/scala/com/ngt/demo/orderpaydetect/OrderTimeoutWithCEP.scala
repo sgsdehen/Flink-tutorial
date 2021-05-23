@@ -1,10 +1,9 @@
 package com.ngt.demo.orderpaydetect
 
 import org.apache.flink.api.common.eventtime.{SerializableTimestampAssigner, WatermarkStrategy}
-import org.apache.flink.cep.{PatternSelectFunction, PatternTimeoutFunction}
-import org.apache.flink.cep.scala.{CEP, PatternStream}
 import org.apache.flink.cep.scala.pattern.Pattern
-import org.apache.flink.streaming.api.TimeCharacteristic
+import org.apache.flink.cep.scala.{CEP, PatternStream}
+import org.apache.flink.cep.{PatternSelectFunction, PatternTimeoutFunction}
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.windowing.time.Time
 
@@ -22,7 +21,7 @@ object OrderTimeoutWithCEP {
     env.setParallelism(1)
     env.getConfig.setAutoWatermarkInterval(1000L)
 
-    val inputStream: DataStream[String] = env.readTextFile("data/LoginLog.csv")
+    val inputStream: DataStream[String] = env.readTextFile("data/OrderLog.csv")
 
     val orderEventStream: DataStream[OrderEvent] = inputStream
       .map(data => {
