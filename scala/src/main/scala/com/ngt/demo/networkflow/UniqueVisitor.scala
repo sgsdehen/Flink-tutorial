@@ -18,7 +18,7 @@ import org.apache.flink.util.Collector
 object UniqueVisitor {
   def main(args: Array[String]): Unit = {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+
     val inputStream: DataStream[String] = env.readTextFile("data/UserBehavior.csv")
     val dataStream: DataStream[UserBehavior] = inputStream.map(data => {
       val arr: Array[String] = data.split(",")

@@ -20,6 +20,7 @@ object LoginFail {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
     env.getConfig.setAutoWatermarkInterval(1000L)
+
     val inputStream: DataStream[String] = env.readTextFile("data/LoginLog.csv")
 
     val loginEventStream: DataStream[LoginEvent] = inputStream
@@ -27,7 +28,8 @@ object LoginFail {
         val arr: Array[String] = data.split(",")
         LoginEvent(arr(0).toLong, arr(1), arr(2), arr(3).toLong)
       })
-      .assignTimestampsAndWatermarks(WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofSeconds(3))
+      .assignTimestampsAndWatermarks(WatermarkStrategy
+        .forBoundedOutOfOrderness(Duration.ofSeconds(3))
         .withTimestampAssigner(new SerializableTimestampAssigner[LoginEvent] {
           override def extractTimestamp(element: LoginEvent, recordTimestamp: Long): Long = element.timestamp * 1000L
         }))
@@ -54,10 +56,10 @@ case class LoginFailWarning(userId: Long, firstFailTime: Long, lastFailTime: Lon
 // 对于两秒内 失败次数大于阈值，但存在登录成功的情况 不能查找出来
 class LoginFailWarningResult(failTimes: Int) extends KeyedProcessFunction[Long, LoginEvent, LoginFailWarning] {
   //定义状态，保存当前所有的登录失败事件，保存定时器的时间戳
-  lazy val loginFailListState: ListState[LoginEvent] =
+  private lazy val loginFailListState: ListState[LoginEvent] =
     getRuntimeContext.getListState(new ListStateDescriptor[LoginEvent]("loginfail-list", classOf[LoginEvent]))
 
-  lazy val timerTsState: ValueState[Long] =
+  private lazy val timerTsState: ValueState[Long] =
     getRuntimeContext.getState(new ValueStateDescriptor[Long]("timer-ts", classOf[Long]))
 
   override def processElement(value: LoginEvent,
@@ -69,12 +71,12 @@ class LoginFailWarningResult(failTimes: Int) extends KeyedProcessFunction[Long, 
         val ts: Long = value.timestamp * 1000L + 2000L
         ctx.timerService().registerEventTimeTimer(ts)
         timerTsState.update(ts)
-      } else {
-        // 如果是成功，那么直接清空状态和定时器，重新开始
-        ctx.timerService().deleteEventTimeTimer(timerTsState.value())
-        loginFailListState.clear()
-        timerTsState.clear()
       }
+    } else {
+      // 如果是成功，那么直接清空状态和定时器，重新开始
+      ctx.timerService().deleteEventTimeTimer(timerTsState.value())
+      loginFailListState.clear()
+      timerTsState.clear()
     }
   }
 
@@ -96,7 +98,6 @@ class LoginFailWarningResult(failTimes: Int) extends KeyedProcessFunction[Long, 
           "login fail in 2s for " + allLoginFailList.length + " times."
         ))
     }
-
     loginFailListState.clear()
     timerTsState.clear()
   }

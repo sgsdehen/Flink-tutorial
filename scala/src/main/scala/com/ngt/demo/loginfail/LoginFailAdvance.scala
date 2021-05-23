@@ -33,7 +33,7 @@ object LoginFailAdvance {
 
 
     // 进行判断和检测，如果2秒之内连续登录失败，输出报警信息
-    val loginFailWarningStream = loginEventStream
+    val loginFailWarningStream: DataStream[LoginFailWarning] = loginEventStream
       .keyBy(_.userId)
       .process(new LoginFailWaringAdvanceResult())
 
@@ -49,10 +49,14 @@ class LoginFailWaringAdvanceResult extends KeyedProcessFunction[Long, LoginEvent
   override def processElement(value: LoginEvent,
                               ctx: KeyedProcessFunction[Long, LoginEvent, LoginFailWarning]#Context,
                               out: Collector[LoginFailWarning]): Unit = {
-    if (value.eventType == "file") {
+    // 首先判断事件类型
+    if (value.eventType == "fail") {
+      // 1. 如果是失败，进一步做判断
       val iter: util.Iterator[LoginEvent] = loginFailListState.get().iterator()
       if (iter.hasNext) {
+
         val firstFailEvent: LoginEvent = iter.next()
+        // 如果在2秒之内，输出报警
         if (value.timestamp < firstFailEvent.timestamp + 2) {
           out.collect(LoginFailWarning(value.userId, firstFailEvent.timestamp, value.timestamp, "login fail 2 times in 2s"))
         }
@@ -60,9 +64,11 @@ class LoginFailWaringAdvanceResult extends KeyedProcessFunction[Long, LoginEvent
         loginFailListState.clear()
         loginFailListState.add(value)
       } else {
+        // 1.2 如果没有，直接把当前事件添加到ListState中
         loginFailListState.add(value)
       }
     } else {
+      // 2. 如果是成功，直接清空状态
       loginFailListState.clear()
     }
   }
