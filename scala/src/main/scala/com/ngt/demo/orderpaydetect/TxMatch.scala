@@ -19,8 +19,7 @@ object TxMatch {
     env.setParallelism(1)
 
     // 1. 读取订单事件数据
-    val resource1: URL = getClass.getResource("/OrderLog.csv")
-    val orderEventStream: KeyedStream[OrderEvent, String] = env.readTextFile(resource1.getPath)
+    val orderEventStream: KeyedStream[OrderEvent, String] = env.readTextFile("data/OrderLog.csv")
       .map(data => {
         val arr: Array[String] = data.split(",")
         OrderEvent(arr(0).toLong, arr(1), arr(2), arr(3).toLong)
@@ -31,8 +30,7 @@ object TxMatch {
 
 
     // 2. 读取到账事件数据
-    val resource2: URL = getClass.getResource("/ReceiptLog.csv")
-    val receiptEventStream: KeyedStream[ReceiptEvent, String] = env.readTextFile(resource2.getPath)
+    val receiptEventStream: KeyedStream[ReceiptEvent, String] = env.readTextFile("data/ReceiptLog.csv")
       .map(data => {
         val arr: Array[String] = data.split(",")
         ReceiptEvent(arr(0), arr(1), arr(2).toLong)
@@ -104,8 +102,12 @@ class TxPayMatchResult extends CoProcessFunction[OrderEvent, ReceiptEvent, (Orde
   override def onTimer(timestamp: Long,
                        ctx: CoProcessFunction[OrderEvent, ReceiptEvent, (OrderEvent, ReceiptEvent)]#OnTimerContext,
                        out: Collector[(OrderEvent, ReceiptEvent)]): Unit = {
-    if (payEventState.value() != null) ctx.output(unmatchedPayEventOutputTag, payEventState.value())
-    if (receiptEventState.value() != null) ctx.output(unmatchedReceiptEventOutputTag, receiptEventState.value())
+    if (payEventState.value() != null) {
+      ctx.output(unmatchedPayEventOutputTag, payEventState.value())
+    }
+    if (receiptEventState.value() != null) {
+      ctx.output(unmatchedReceiptEventOutputTag, receiptEventState.value())
+    }
     receiptEventState.clear()
     payEventState.clear()
   }
