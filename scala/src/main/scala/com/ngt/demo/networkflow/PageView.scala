@@ -1,6 +1,6 @@
 package com.ngt.demo.networkflow
 
-import com.ngt.demo.userbehavior.UserBehavior
+import com.ngt.demo.hotitems.UserBehavior
 import org.apache.flink.api.common.functions.{AggregateFunction, MapFunction}
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction

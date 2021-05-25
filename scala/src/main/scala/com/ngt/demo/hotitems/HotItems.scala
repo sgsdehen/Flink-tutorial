@@ -1,4 +1,4 @@
-package com.ngt.demo.userbehavior
+package com.ngt.demo.hotitems
 
 import org.apache.flink.api.common.eventtime.{SerializableTimestampAssigner, WatermarkStrategy}
 import org.apache.flink.api.common.functions.AggregateFunction

@@ -1,6 +1,6 @@
 package com.ngt.demo.networkflow
 
-import com.ngt.demo.userbehavior.UserBehavior
+import com.ngt.demo.hotitems.UserBehavior
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.scala.function.AllWindowFunction
