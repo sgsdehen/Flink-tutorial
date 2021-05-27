@@ -20,6 +20,7 @@ object CountWindowDemo {
     val keyed: KeyedStream[(String, Int), String] = wordAndCount.keyBy(_._1)
     // 组内增量聚合，组内达到指定的条数就进行触发输出
     keyed.countWindow(3).sum(1).print()
+    //    keyed.countWindow(10,5).sum(1).print()
     env.execute()
   }
 

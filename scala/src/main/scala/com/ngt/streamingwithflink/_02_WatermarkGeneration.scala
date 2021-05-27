@@ -85,8 +85,12 @@ class PeriodicAssigner extends WatermarkGenerator[SensorReading] {
 
   override def onPeriodicEmit(output: WatermarkOutput): Unit = {
     output.emitWatermark(new Watermark(currentMaxTimestamp - maxOutOfOrderness - 1))
+    //output.emitWatermark(new Watermark(System.currentTimeMillis() - maxOutOfOrderness))
   }
 }
+
+
+
 
 // 定点水位分配器
 class PunctuatedAssigner extends WatermarkGenerator[SensorReading] {
