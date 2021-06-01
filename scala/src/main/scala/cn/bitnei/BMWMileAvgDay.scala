@@ -13,6 +13,7 @@ import scala.collection.mutable.ListBuffer
  * Created on 2021-06-01 22:11.
  *
  * @author ngt
+ *         每天行驶里程统计
  */
 object BMWMileAvgDay {
   def main(args: Array[String]): Unit = {

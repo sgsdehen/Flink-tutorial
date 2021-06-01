@@ -13,6 +13,7 @@ import scala.collection.mutable.ListBuffer
  * Created on 2021-06-01 20:40.
  *
  * @author ngt
+ *         每次行驶里程统计
  */
 object BMWMileAvgCount {
   def main(args: Array[String]): Unit = {
@@ -30,7 +31,7 @@ object BMWMileAvgCount {
     lines.filter(!_.contains("veh_model_name"))
       .map(line => {
         val arr: Array[String] = line.split(",")
-        (arr(18), arr(1), arr(29).toDouble, arr(17).toInt,System.currentTimeMillis())
+        (arr(18), arr(1), arr(29).toDouble, arr(17).toInt, System.currentTimeMillis())
       }).filter(_._4 != 0)
       .assignAscendingTimestamps(data => data._5)
       .map(data => MileCount(data._1, data._2, data._3))
@@ -86,11 +87,11 @@ class MileCountWindow extends ProcessWindowFunction[(MileCount, Int), String, (S
     for (elem <- iterator) {
       list(elem._1.mileAvgCount.toInt / 10) += elem._2
     }
-    val listString:StringBuffer = new StringBuffer()
+    val listString: StringBuffer = new StringBuffer()
     for (elem <- list) {
       listString.append(elem).append(",")
     }
 
-    out.collect(key._1 + "," + key._2 + "," + listString.substring(0,listString.length()-1))
+    out.collect(key._1 + "," + key._2 + "," + listString.substring(0, listString.length() - 1))
   }
 }
