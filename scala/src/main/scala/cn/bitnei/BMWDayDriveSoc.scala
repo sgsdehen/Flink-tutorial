@@ -10,12 +10,11 @@ import org.apache.flink.util.Collector
 import scala.collection.mutable.ListBuffer
 
 /**
- * Created on 2021-06-01 23:27.
- *
- * @author ngt
- *         每天行驶次数统计
+ * @author ngt on 2021-06-02 8:22
+ * @version 1.0
+ *          次均行驶消耗Soc
  */
-object BMWDayAvgRunNums {
+object BMWDayDriveSoc {
   def main(args: Array[String]): Unit = {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
@@ -31,13 +30,24 @@ object BMWDayAvgRunNums {
     lines.filter(!_.contains("veh_model_name"))
       .map(line => {
         val arr: Array[String] = line.split(",")
-        (arr(18), arr(1), arr(22).toInt, arr(17).toInt, System.currentTimeMillis())
+        (arr(18), arr(1), arr(45).toDouble, arr(17).toInt, System.currentTimeMillis())
       }).filter(_._4 != 0)
       .assignAscendingTimestamps(data => data._5)
-      .map(data => DayRunNums(data._1, data._2, data._3))
+      .map(data => DayDriveSoc(data._1, data._2, data._3))
       .filter(data => cityList.contains(data.drive_city))
       .map(data => {
-        if (data.dayAvgRunNums > 9) data.dayAvgRunNums = 9
+        if (data.dayAvgDriveSoc <= 10) data.dayAvgDriveSoc = 0
+        if (data.dayAvgDriveSoc > 10 && data.dayAvgDriveSoc <= 20) data.dayAvgDriveSoc = 10
+        if (data.dayAvgDriveSoc > 20 && data.dayAvgDriveSoc <= 30) data.dayAvgDriveSoc = 20
+        if (data.dayAvgDriveSoc > 30 && data.dayAvgDriveSoc <= 40) data.dayAvgDriveSoc = 30
+        if (data.dayAvgDriveSoc > 40 && data.dayAvgDriveSoc <= 50) data.dayAvgDriveSoc = 40
+        if (data.dayAvgDriveSoc > 50 && data.dayAvgDriveSoc <= 60) data.dayAvgDriveSoc = 50
+        if (data.dayAvgDriveSoc > 60 && data.dayAvgDriveSoc <= 70) data.dayAvgDriveSoc = 60
+        if (data.dayAvgDriveSoc > 70 && data.dayAvgDriveSoc <= 80) data.dayAvgDriveSoc = 70
+        if (data.dayAvgDriveSoc > 80 && data.dayAvgDriveSoc <= 90) data.dayAvgDriveSoc = 80
+        if (data.dayAvgDriveSoc > 90 && data.dayAvgDriveSoc <= 100) data.dayAvgDriveSoc = 90
+        if (data.dayAvgDriveSoc > 100 ) data.dayAvgDriveSoc = 100
+
         if (data.veh_common_name == "奔驰EQC350 4MATIC" || data.veh_common_name == "奔驰EQC400") {
           data.veh_common_name = "奔驰EQC"
         }
@@ -47,42 +57,41 @@ object BMWDayAvgRunNums {
         }
         data
       })
-      .filter(_.dayAvgRunNums != 0)
       .map((_, 1))
       .keyBy(data => (data._1.drive_city, data._1.veh_common_name))
       .window(TumblingEventTimeWindows.of(Time.seconds(20)))
-      .process(new DayRunNumsWindow)
+      .process(new DayDriveSocWindow())
       .print()
+
 
     env.execute()
   }
 }
-
-
-case class DayRunNums(
+case class DayDriveSoc(
                        drive_city: String,
                        var veh_common_name: String,
-                       var dayAvgRunNums: Int
+                       var dayAvgDriveSoc: Double
                      )
 
 
-class DayRunNumsWindow extends ProcessWindowFunction[(DayRunNums, Int), String, (String, String), TimeWindow] {
+class DayDriveSocWindow extends ProcessWindowFunction[(DayDriveSoc, Int), String, (String, String), TimeWindow] {
   override def process(key: (String, String),
                        context: Context,
-                       elements: Iterable[(DayRunNums, Int)],
+                       elements: Iterable[(DayDriveSoc, Int)],
                        out: Collector[String]): Unit = {
     val list: ListBuffer[Int] = new ListBuffer[Int]
-    for (i <- 1 to 9) {
+    for (i <- 1 to 11) {
       list += 0
     }
-    val iterator: Iterator[(DayRunNums, Int)] = elements.iterator
+    val iterator: Iterator[(DayDriveSoc, Int)] = elements.iterator
     for (elem <- iterator) {
-      list(elem._1.dayAvgRunNums - 1) += elem._2
+      list(elem._1.dayAvgDriveSoc.toInt / 10) += elem._2
     }
     val listString: StringBuffer = new StringBuffer()
     for (elem <- list) {
       listString.append(elem).append(",")
     }
+
     out.collect(key._1 + "," + key._2 + "," + listString.substring(0, listString.length() - 1))
   }
 }
