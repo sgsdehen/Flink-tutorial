@@ -32,9 +32,8 @@ object BMWFristTime {
       .window(TumblingEventTimeWindows.of(Time.seconds(20)))
       .process(new FirstTimeWindow)
 
-
-    val filePath = "data/充电环保性1.csv"
-    val file = new File(filePath)
+    val filePath: String = "data/充电环保性1.csv"
+    val file: File = new File(filePath)
     if (file.exists()) {
       file.delete()
     }
