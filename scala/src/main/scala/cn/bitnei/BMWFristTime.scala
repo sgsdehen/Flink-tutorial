@@ -20,7 +20,7 @@ object BMWFristTime {
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
     env.setParallelism(1)
-    val lines: DataStream[String] = env.readTextFile("data/充电环保性.csv")
+    val lines: DataStream[String] = env.readTextFile("data/baoma/日均出行次数-城市.csv")
 
     val value: DataStream[String] = lines.map(data => {
       val arr: Array[String] = data.split(",")
@@ -38,9 +38,9 @@ object BMWFristTime {
       file.delete()
     }
 
-    value
-      .map(data =>output(data))
-      .writeAsCsv(filePath)
+//    value
+//      .map(data =>output(data))
+//      .writeAsCsv(filePath)
 
     value.print()
     env.execute()
@@ -56,13 +56,13 @@ class FirstTimeWindow extends ProcessWindowFunction[FirstTime,String,(String,Str
                        context: Context, elements: Iterable[FirstTime],
                        out: Collector[String]): Unit = {
     val list: ListBuffer[Int] = new ListBuffer[Int]
-    for (i <- 0 to 2) {
+    for (i <- 0 to 9) {
       list += 0
     }
 
     val iterator: Iterator[FirstTime] = elements.iterator
     for (elem <- iterator){
-      list(elem.fistTime-1) = elem.vehCount
+      list(elem.fistTime) = elem.vehCount
     }
     val listString: StringBuffer = new StringBuffer()
     for (elem <- list) {
