@@ -11,6 +11,7 @@
     <modules>
         <module>java</module>
         <module>scala</module>
+        <module>CDC</module>
     </modules>
 
     <!--    配置maven数据源-->
@@ -41,7 +42,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.12.2</flink.version>
+        <flink.version>1.12.5</flink.version>
         <target.java.version>11</target.java.version>
         <scala.binary.version>2.12</scala.binary.version>
         <maven.compiler.source>11</maven.compiler.source>
